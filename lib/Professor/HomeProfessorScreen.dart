@@ -4,6 +4,7 @@ import 'package:app_ipv/Classes/Professor.dart';
 import 'package:app_ipv/Design/Widgets/CardAulaWidget.dart';
 import 'package:app_ipv/Gestao/Gestao.dart';
 import 'package:app_ipv/Gestao/Uteis.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class HomeProfessor extends StatefulWidget {
@@ -65,21 +66,7 @@ class _HomeProfessorState extends State<HomeProfessor> {
               future: getAulas(),
               builder: (BuildContext context, AsyncSnapshot snapshot){
                 if (snapshot.hasData){
-                  return Container(
-                    padding: const EdgeInsets.only(left: 23),
-                    height: 160,
-                    child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (BuildContext context, int index){
-                          return CardAulaWidget(
-                              idUsuario: widget.professor.id,
-                              aula: snapshot.data[index],
-                              acessoProfessor: true,
-                              ref_gestor: widget.ref_gestor
-                          );
-                        }),
-                  );
+                  return containerAulas();
                 }else if (snapshot.hasError){
                   return const Text('Hoje não há aulas');
                 }else{
@@ -92,17 +79,39 @@ class _HomeProfessorState extends State<HomeProfessor> {
     );
   }
 
+  Container containerAulas()
+  {
+    return Container(
+      padding: const EdgeInsets.only(left: 23),
+      height: 160,
+      child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: listaAulas.length,
+          itemBuilder: (BuildContext context, int index){
+            return CardAulaWidget(
+                idUsuario: widget.professor.id,
+                aula: listaAulas[index],
+                acessoProfessor: true,
+                ref_gestor: widget.ref_gestor,
+            );
+          }),
+    );
+  }
+
   // Função para obter as aulas do professor -----------------------------------
-  Future <List> getAulas() async{
+  Future<List> getAulas() async{
     DateTime now =  DateTime.now();
     DateTime date = DateTime(now.year, now.month, now.day);
-    String data = "${date.year}-${date.month}-${date.day}";
+    //String data = "${date.year}-${date.month}-${date.day}";
+    String data = "2021-11-10";
 
     var resultado = await widget.ref_gestor.getAulas("professor", widget.professor.id, data);
 
-    List dados = jsonDecode(resultado);
+    listaAulas = jsonDecode(resultado);
 
-    listaAulas = dados;
+    setState(() {
+      listaAulas = jsonDecode(resultado);
+    });
 
     return listaAulas;
   }

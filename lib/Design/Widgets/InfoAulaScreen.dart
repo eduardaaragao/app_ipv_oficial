@@ -1,11 +1,15 @@
 
+import 'dart:convert';
+
+import 'package:app_ipv/Classes/Dados.dart';
 import 'package:app_ipv/Design/Bot%C3%B5es/BotaoDark.dart';
 import 'package:app_ipv/Gestao/Gestao.dart';
 import 'package:app_ipv/Gestao/Uteis.dart';
 import 'package:app_ipv/Student/ScanScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-//import 'package:permission_handler/permission_handler.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'Mobile.dart';
 import 'PresencasWidget.dart';
 
 class InfoAula extends StatefulWidget {
@@ -18,7 +22,7 @@ class InfoAula extends StatefulWidget {
     @required this.aula,
     @required this.professor,
     @required this.ref_gestor,
-    @required this.id});
+    @required this.id,});
   @override
   _InfoAulaState createState() => _InfoAulaState(this.professor, this.aula);
 }
@@ -120,7 +124,7 @@ class _InfoAulaState extends State<InfoAula> {
               },
             );
           }else if(snapshot.hasError){
-            return Center(child: const CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }else{
             return const Text('As presenças ainda não foram contabilizadas para esta aula.', textAlign: TextAlign.center);
           }
@@ -138,7 +142,26 @@ class _InfoAulaState extends State<InfoAula> {
     });
 
     Uteis.mostrarMensagem(context, "Aula encerrada!", "OK");
+
     goHomeProfessor();
+  }
+
+  // Função para obter as aulas do professor -----------------------------------
+  Future<List> getAulas() async{
+    DateTime now =  DateTime.now();
+    DateTime date = DateTime(now.year, now.month, now.day);
+    //String data = "${date.year}-${date.month}-${date.day}";
+    String data = "2021-11-10";
+
+    var resultado = await widget.ref_gestor.getAulas("professor", widget.id, data);
+
+    listaAulas = jsonDecode(resultado);
+
+    setState(() {
+      listaAulas = jsonDecode(resultado);
+    });
+
+    return listaAulas;
   }
 
   /*INICIAR AULA DO PROFESSOR -----------------------------------------------*/
@@ -151,6 +174,7 @@ class _InfoAulaState extends State<InfoAula> {
       });
       Uteis.mostrarMensagem(context, "Aula iniciada!", "OK");
     }
+    getAulas();
   }
 
   /*IR PARA A PÁGINA HOME ----------------------------------------------------*/
@@ -164,19 +188,39 @@ class _InfoAulaState extends State<InfoAula> {
     DateTime date = DateTime(now.year, now.month, now.day);
     String data = "${date.day}-${date.month}-${date.year}";
 
-    //await Permission.storage.request();
+    PdfDocument document = PdfDocument();
 
-    /*if (await Permission.storage.isGranted)
-    {
-      PdfDocument document = PdfDocument();
+    PdfGrid grid = PdfGrid();
+    grid.style = PdfGridStyle(
+      font: PdfStandardFont(PdfFontFamily.helvetica, 17),
+      cellPadding: PdfPaddings(left: 5, right: 2, top: 2, bottom: 2),
+    );
+    grid.columns.add(count: 2);
+    grid.headers.add(1);
 
-      document.pages.add();
+    PdfGridRow header = grid.headers[0];
+    header.cells[0].value = "Nome Aluno";
+    header.cells[1].value = "Nº Mecanográfico";
 
-      List<int> bytes = document.save();
-      document.dispose();
+    PdfGridRow row = grid.rows.add();
 
-      saveAndLaunchFile(bytes, 'Presencas.pdf');
-    }*/
+    row.cells[0].value = dadosFake[0]["NOME"];
+    row.cells[1].value = dadosFake[0]["NUMERO"];
+
+    row = grid.rows.add();
+
+    row.cells[0].value = dadosFake[1]["NOME"];
+    row.cells[1].value = dadosFake[1]["NUMERO"];
+
+
+    grid.draw(page: document.pages.add(),
+        bounds: const Rect.fromLTWH(0, 0, 0, 0)
+    );
+
+    List<int> bytes = document.save();
+    document.dispose();
+
+    saveAndLaunchFile(bytes, 'PresencasTurno${widget.aula["TURNO"]}(${data}).pdf');
   }
   /*--------------------------------------------------------------------------*/
 
@@ -225,7 +269,7 @@ class _InfoAulaState extends State<InfoAula> {
   }
 
   /*REDIRECIONAR À PÁGINA DE CONFIRMAÇÃO--------------------------------------*/
-  Function goToScanPage() {
+  void goToScanPage() {
     Navigator.push(
         context,
         MaterialPageRoute(

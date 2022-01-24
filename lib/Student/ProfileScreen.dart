@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
   final ButtonStyle flatButtonStyle = TextButton.styleFrom(
-    padding: EdgeInsets.all(20),
+    padding: const EdgeInsets.all(20),
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(15)),
     ),
@@ -80,14 +80,14 @@ class ProfileMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: TextButton(
         onPressed: press,
         style: flatButtonStyle,
         child: Row(
           children: [
             icone,
-            SizedBox(width: 20),
+            const SizedBox(width: 20),
             Expanded(
               child: Text(text, style: Theme.of(context).textTheme.bodyText1),
             ),

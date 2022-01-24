@@ -16,7 +16,7 @@ class CardAulaWidget extends StatelessWidget {
     @required this.acessoProfessor,
     @required this.ref_gestor,
     @required this.idUsuario,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class CardAulaWidget extends StatelessWidget {
           ref_gestor: ref_gestor,
           aula: aula,
           professor: acessoProfessor,
-          id: idUsuario,
+          id: idUsuario
         )));
     }
 
@@ -46,7 +46,7 @@ class CardAulaWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                aula["ESTADO"] == '1' ? _labelWidget() : Text(""),
+                aula["ESTADO"] == '1' ? _labelWidget() : const Text(""),
                 Text(aula["NOME"], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Uteis.kPrimaryDarkColorTwo)),
                 const SizedBox(height: 10),
                 Column(

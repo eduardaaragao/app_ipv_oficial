@@ -9,5 +9,5 @@ Future<void> saveAndLaunchFile(List<int> bytes, String fileName) async{
 
   await file.writeAsBytes(bytes, flush: true);
 
-//  OpenFile.open(filePath);
+  OpenFile.open(filePath);
 }

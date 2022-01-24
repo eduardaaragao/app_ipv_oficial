@@ -103,7 +103,7 @@ class _HomeStudentScreenState extends State<HomeStudentScreen> {
   Container list(data)
   {
     return Container(
-      padding: EdgeInsets.only(left: 23),
+      padding: const EdgeInsets.only(left: 23),
       height: 160,
       child: ListView.builder(
           scrollDirection: Axis.horizontal,
