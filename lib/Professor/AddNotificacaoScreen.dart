@@ -24,7 +24,7 @@ class AddNotificacao extends StatefulWidget {
 }
 
 class _AddNotificacaoState extends State<AddNotificacao> {
-  Map <String, bool> turnosSelecionados = {};
+  Map <String, dynamic> turnosSelecionados = {};
 
   bool selected = false;
   String _descricao = '';
@@ -32,6 +32,8 @@ class _AddNotificacaoState extends State<AddNotificacao> {
   String valueDisc = disciplinas[0].codigo;
 
   var tmpArray = [];
+
+  var listadeturnos = [];
 
   @override
   void initState() {
@@ -43,11 +45,17 @@ class _AddNotificacaoState extends State<AddNotificacao> {
 
   // Obter os turnos que foram selecionados na caixa ---------------------------
   getCheckBoxItems(){
-    turnosSelecionados.forEach((key, value) {
+    for (var element in listadeturnos) {
+      if (element["selecionado"] == true)
+        {
+          tmpArray.add(element["id"]);
+        }
+    }
+    /*turnosSelecionados.forEach((key, value) {
       if (value==true){
         tmpArray.add(key);
       }
-    });
+    });*/
   }
 
   @override
@@ -88,13 +96,13 @@ class _AddNotificacaoState extends State<AddNotificacao> {
 
   /* Selecionar os turnos para que a mensagem será enviada -------------- */
   Future<void> getTurnos(String codigoDisc) async{
- //   String codigoDisc;
+    listadeturnos.clear();
+    turnos.clear();
 
-    for (var e in disciplinas) {
-      if (e.codigo == valueDisc){
-        codigoDisc = e.codigo;
-      }
-    }
+    setState(() {
+      listadeturnos;
+    });
+
     final response = await widget.ref_gestor.getTurnos(widget.professor.id, codigoDisc);
 
     final data = jsonDecode(response);
@@ -105,18 +113,16 @@ class _AddNotificacaoState extends State<AddNotificacao> {
     });
 
     for (var element in turnos) {
-      print("NOME DO TURNO = ${element.turno} ID = ${element.id}");
+      turnosSelecionados.addAll({element.id.toString(): false});
     }
-    print(turnos.length);
 
-    turnos.forEach((element) {
-      turnosSelecionados.addAll({element.turno.toString(): false});
-    });
+    for (var element in turnos) {
+      listadeturnos.add({'id': element.id.toString(), 'selecionado': false, 'turno': element.turno.toString()});
+    }
 
     setState(() {
-      turnosSelecionados;
+      listadeturnos;
     });
-    turnos.clear();
   }
 
   /* Lista de turnos -----------------------------------------------*/
@@ -124,25 +130,24 @@ class _AddNotificacaoState extends State<AddNotificacao> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
       height: MediaQuery.of(context).size.height * 0.20,
-      child: GridView.builder(
+        child: GridView.builder(
           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 100,
               childAspectRatio: 3 / 2,
               crossAxisSpacing: 15,
               mainAxisSpacing: 15),
-          itemCount: turnosSelecionados.length,
+          itemCount: listadeturnos.length,
           itemBuilder: (BuildContext ctx, index) {
-            var atual = index + 1;
             return Container(
               alignment: Alignment.center,
               child: CheckboxListTile(
                 onChanged: (value) {
                   setState(() {
-                   turnosSelecionados[atual.toString()] = value;
+                    listadeturnos[index]["selecionado"] = value;
                   });
                 },
-                value: turnosSelecionados[atual.toString()],
-                title: Text("1"),//Text(turnos[index].turno),
+                value: listadeturnos[index]["selecionado"],
+                title: Text(listadeturnos[index]["turno"]),
                 checkColor: Colors.white,
                 activeColor: Uteis.kPrimaryDarkColor,
               ),
@@ -165,8 +170,6 @@ class _AddNotificacaoState extends State<AddNotificacao> {
     });
 
     getCheckBoxItems();
-
-    print(tmpArray);
 
     var resultado = await widget.ref_gestor.sendNotification(widget.professor.id, tmpArray, _descricao);
 
