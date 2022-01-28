@@ -1,6 +1,4 @@
-
 import 'dart:convert';
-
 import 'package:app_ipv/Classes/Dados.dart';
 import 'package:app_ipv/Design/Bot%C3%B5es/BotaoDark.dart';
 import 'package:app_ipv/Gestao/Gestao.dart';
