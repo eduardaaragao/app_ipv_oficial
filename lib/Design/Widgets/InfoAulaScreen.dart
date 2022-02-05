@@ -202,14 +202,17 @@ class _InfoAulaState extends State<InfoAula> {
 
     PdfGridRow row = grid.rows.add();
 
-    row.cells[0].value = dadosFake[0]["NOME"];
-    row.cells[1].value = dadosFake[0]["NUMERO"];
+    int j = 0;
 
-    row = grid.rows.add();
-
-    row.cells[0].value = dadosFake[1]["NOME"];
-    row.cells[1].value = dadosFake[1]["NUMERO"];
-
+    for (j; j < dadosFake.length; j++)
+    {
+      row.cells[0].value = dadosFake[j]["NOME"];
+      row.cells[1].value = dadosFake[j]["NUMERO"];
+      if (j+1 != dadosFake.length)
+      {
+        row = grid.rows.add();
+      }
+    }
 
     grid.draw(page: document.pages.add(),
         bounds: const Rect.fromLTWH(0, 0, 0, 0)
@@ -218,7 +221,7 @@ class _InfoAulaState extends State<InfoAula> {
     List<int> bytes = document.save();
     document.dispose();
 
-    saveAndLaunchFile(bytes, 'PresencasTurno${widget.aula["TURNO"]}(${data}).pdf');
+    saveAndLaunchFile(bytes, 'PresencasTurno${widget.aula["TURNO"]}($data).pdf');
   }
   /*--------------------------------------------------------------------------*/
 
@@ -271,7 +274,7 @@ class _InfoAulaState extends State<InfoAula> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) => ScanScreen(),
+          builder: (BuildContext context) => const ScanScreen(),
         ));
   }
 

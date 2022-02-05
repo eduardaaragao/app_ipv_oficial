@@ -103,7 +103,7 @@ class _HomeProfessorState extends State<HomeProfessor> {
     DateTime now =  DateTime.now();
     DateTime date = DateTime(now.year, now.month, now.day);
     //String data = "${date.year}-${date.month}-${date.day}";
-    String data = "2021-11-10";
+    String data = "2021-11-23";
 
     var resultado = await widget.ref_gestor.getAulas("professor", widget.professor.id, data);
 
